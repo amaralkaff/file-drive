@@ -1,37 +1,36 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { api } from "../../convex/_generated/api";
-import { SignInButton, SignOutButton, SignedIn, SignedOut, useOrganization } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, SignedIn, SignedOut, useOrganization, useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 
+
 export default function Page() {
-  const { organization } = useOrganization();
-  console.log(organization?.id);
+  const organization = useOrganization();
+  const user = useUser()
+  let orgId: string | undefined = undefined;
+  if (organization.isLoaded && user.isLoaded) {
+    orgId = organization.organization?.id ?? user.user?.id;
+  }
+  const files = useQuery(api.files.getFiles, orgId ? { orgId } : "skip");
   const createFile = useMutation(api.files.createFile);
-  const files = useQuery(api.files.getFiles, { name: "Hello World" });
   return (
     <main className="flex flex-col items-center justify-center w-screen h-screen space-y-4">
       <h1 className="text-4xl font-bold">Welcome to Drive-mangLy</h1>
-      <SignedIn>
-        <SignOutButton>
-          <Button>Sign out</Button>
-        </SignOutButton>
-      </SignedIn>
-      <SignedOut>
-        <SignInButton mode="modal" >
-          <Button>Sign in</Button>
-        </SignInButton>
-      </SignedOut>
+      {files?.map(file => (
+        <div key={file._id}>{file.name}</div>
+      ))}
 
-      {files?.map(file => {
-        return <div key={file._id}>{file.name}</div>
-      })}
+      {files?.length === 0 && (
+        <div>No files found</div>
+      )}
 
       <Button onClick={() => {
-        if (!organization) {
+        console.log(organization, "orgId", orgId);
+        if (!orgId) {
           return;
         }
-        createFile({ name: "Hello World", orgId: organization.id })
+        createFile({ name: "Hello World", orgId })
       }
       }>Create file</Button>
     </main>
