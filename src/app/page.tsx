@@ -33,6 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { set, useForm } from "react-hook-form"
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
 
 const formSchema = z.object({
   title: z.string().min(1).max(200),
@@ -58,32 +59,53 @@ export default function Page() {
   const fileRef = form.register("file");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!orgId) return;
-
-    const postUrl = await generateUploadUrl();
-
-    const result = await fetch(postUrl, {
-      method: "POST",
-      headers: { "Content-Type": values.file[0]!.type },
-      body: values.file[0],
-    });
-    const { storageId } = await result.json();
-
-    await createFile({
-      name: values.title,
-      fileId: storageId,
-      orgId
-    });
-
-    form.reset();
-
-    setIsFileDialogOpen(false);
-
-    toast({
-      variant: "default",
-      title: "File uploaded",
-      description: "Your file has been uploaded",
-    })
+    try {
+      if (!user) {
+        toast({
+          variant: "destructive",
+          title: "Sign in required",
+          description: "You must be signed in to upload a file",
+          action: <ToastAction altText="Sign in" onClick={() => {
+            // @ts-ignore
+            <SignInButton />
+          }}>Sign in</ToastAction>
+        });
+        return;
+      }
+  
+      if (!orgId) return;
+  
+      const postUrl = await generateUploadUrl();
+  
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": values.file[0]!.type },
+        body: values.file[0],
+      });
+      const { storageId } = await result.json();
+  
+      await createFile({
+        name: values.title,
+        fileId: storageId,
+        orgId
+      });
+  
+      form.reset();
+  
+      setIsFileDialogOpen(false);
+  
+      toast({
+        variant: "default",
+        title: "File uploaded",
+        description: "Your file has been uploaded",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An error occurred while uploading the file"
+      });
+    }
   }
 
   let orgId: string | undefined = undefined;
