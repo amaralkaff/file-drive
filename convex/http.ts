@@ -26,14 +26,14 @@ http.route({
         case "user.created":
           await ctx.runMutation(internal.users.createUser, {
             tokenIdentifier: `https://legal-oriole-36.clerk.accounts.dev|${result.data.id}`,
-            });
+          });
           break;
-          case "organizationMembership.created":
-            await ctx.runMutation(internal.users.addOrgIdToUser, {
-              tokenIdentifier: `https://legal-oriole-36.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
-              orgId: result.data.organization.id,
-            });
-        }
+        case "organizationMembership.created":
+          await ctx.runMutation(internal.users.addOrgIdToUser, {
+            tokenIdentifier: `https://legal-oriole-36.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+            orgId: result.data.organization.id,
+          });
+      }
 
       return new Response(null, {
         status: 200,
