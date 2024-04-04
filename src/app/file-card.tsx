@@ -16,7 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, TrashIcon } from "lucide-react";
+import {
+  FileTextIcon,
+  GanttChartIcon,
+  ImageIcon,
+  MoreVertical,
+  TextIcon,
+  TrashIcon,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +35,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useToast } from "@/components/ui/use-toast";
@@ -51,11 +58,12 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
+              className="bg-red-600 text-white"
               onClick={async () => {
                 await deleteFile({ fileId: file._id });
                 setIsConfirmOpen(false);
                 toast({
-                  variant: "destructive",
+                  variant: "default",
                   title: "File deleted",
                   description: "Your file has been deleted",
                 });
@@ -86,18 +94,25 @@ function FileCardActions({ file }: { file: Doc<"files"> }) {
 }
 
 export function FileCard({ file }: { file: Doc<"files"> }) {
+  const typeIcon = {
+    image: <ImageIcon />,
+    pdf: <FileTextIcon />,
+    csv: <GanttChartIcon />,
+  } as Record<Doc<"files">["type"], ReactNode>;
   return (
     <Card>
       <CardHeader className="relative">
-        <CardTitle>{file.name}</CardTitle>
+        <CardTitle className="flex items-center gap-2 truncate">
+          <div className="flex justify-center items-center w-8 h-8 rounded-full bg-gray-200">
+            {typeIcon[file.type]}
+          </div>{" "}
+          {file.name}
+        </CardTitle>
         <div className="absolute top-3 right-3">
           <FileCardActions file={file} />
         </div>
         {/* <CardDescription>Card Description</CardDescription> */}
       </CardHeader>
-      <CardContent>
-        <p>Card Content</p>
-      </CardContent>
       <CardFooter>
         <Button>Download</Button>
       </CardFooter>

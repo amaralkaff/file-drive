@@ -8,19 +8,19 @@ import {
 
 export function Header() {
   return (
-    <div className="border-b border-gray-200">
-      <div className="container mx-auto justify-between flex items-center py-4 bg-gray-50">
+    <div className="sticky top-0 z-10 bg-white shadow-md">
+      <div className="container mx-auto flex items-center justify-between py-4">
         <div>
-          <a href="/" className="text-lg font-bold">
-            Drive-MangLy
+          <a href="/" className="text-xl font-semibold">
+            DriveMangLy
           </a>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-4">
           <OrganizationSwitcher />
           <UserButton />
           <SignedOut>
             <SignInButton mode="modal">
-              <Button>SignIn</Button>
+              <Button>Sign in</Button>
             </SignInButton>
           </SignedOut>
         </div>

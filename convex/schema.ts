@@ -2,9 +2,16 @@ import { users } from "@clerk/clerk-sdk-node";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+export const filesTypes = v.union(
+  v.literal("image"),
+  v.literal("csv"),
+  v.literal("pdf")
+);
+
 export default defineSchema({
   files: defineTable({
     name: v.string(),
+    type: filesTypes,
     orgId: v.optional(v.string()),
     fileId: v.id("_storage"),
   }).index("by_orgId", ["orgId"]),

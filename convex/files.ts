@@ -2,6 +2,7 @@ import { log } from "console";
 import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { getUser } from "./users";
+import { filesTypes } from "./schema";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -36,6 +37,7 @@ export const createFile = mutation({
     name: v.string(),
     fileId: v.id("_storage"),
     orgId: v.string(),
+    type: filesTypes,
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity();
@@ -60,6 +62,7 @@ export const createFile = mutation({
       name: args.name,
       orgId: args.orgId,
       fileId: args.fileId,
+      type: args.type,
     });
   },
 });
